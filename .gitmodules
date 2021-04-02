@@ -1,0 +1,3 @@
+[submodule "zstore"]
+	path = zstore
+	url = https://github.com/leon-mbs/zstore.git

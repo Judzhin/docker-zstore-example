@@ -1,0 +1,48 @@
+version: '3.5'
+
+services:
+  php-apache:
+    container_name: zstore-php-apache
+    build:
+      context: .
+      target: ${APP_ENV:-dev}
+      dockerfile: .docker/php-apache/Dockerfile
+      args:
+        APP_ENV: ${APP_ENV:-dev}
+    ports:
+    - ${APACHE_PORT:-8080}:80
+    volumes:
+      - ./zstore/www/logs/apache2:/var/log/apache2
+      - ./zstore/www:/var/www/html:rw
+      - ./config.ini:/var/www/html/config/config.ini:rw
+      - ~/.composer:/root/.composer/cache
+
+  mariadb:
+    container_name: zstore-mariadb-${APP_ENV:-dev}
+    build:
+      context: .
+      target: ${APP_ENV:-dev}
+      dockerfile: .docker/mariadb/Dockerfile
+      args:
+        APP_ENV: ${APP_ENV:-dev}
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-zstore.dev}
+      MYSQL_USER: ${MYSQL_USER:-root}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-root}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+    volumes:
+      - ./zstore/www/logs/mysql:/var/log/mysql
+      - zstore-mariadb:/var/lib/mysql:rw
+
+  pma:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: zstore-pma-${APP_ENV:-dev}
+    ports:
+      - ${PMA_PORT_MASTER:-8181}:80
+    environment:
+      PMA_HOST: ${PMA_HOST_MASTER:-mariadb}
+    depends_on:
+      - mariadb
+
+volumes:
+  zstore-mariadb:
