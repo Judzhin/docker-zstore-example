@@ -2,7 +2,7 @@ version: '3.5'
 
 services:
   php-apache:
-    container_name: zstore-php-apache
+    container_name: zstore-php-apache-${APP_ENV:-dev}
     build:
       context: .
       target: ${APP_ENV:-dev}
@@ -14,7 +14,7 @@ services:
     volumes:
       - ./zstore/www/logs/apache2:/var/log/apache2
       - ./zstore/www:/var/www/html:rw
-      - ./config.ini:/var/www/html/config/config.ini:rw
+      - ./config.ini:/var/www/html/config/config.ini
       - ~/.composer:/root/.composer/cache
 
   mariadb:
@@ -25,6 +25,7 @@ services:
       dockerfile: .docker/mariadb/Dockerfile
       args:
         APP_ENV: ${APP_ENV:-dev}
+    working_dir: /db
     environment:
       MYSQL_DATABASE: ${MYSQL_DATABASE:-zstore.dev}
       MYSQL_USER: ${MYSQL_USER:-root}
