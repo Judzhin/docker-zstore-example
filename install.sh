@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
 echo "[01] Clone Submodule ZStore\n";
-git submodule update --init --recursive
+git submodule update --recursive --remote
+# git submodule update --init --recursive
 
 echo "[02] Builde Docker Containers\n";
 docker-compose up -d --build
